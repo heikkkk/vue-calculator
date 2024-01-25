@@ -1,16 +1,16 @@
 <template>
-    <div class="test"></div>
     <div class="numpad">
         <div 
-            v-for="number in numbers"
+            v-for="number in requiredButtons"
             :key="number.indexOf"
             class="button"
             :columns="columns"
             :rows="rows"
         >
-        <BaseButton
-            :value="number"
-        />
+            <BaseButton 
+                :value="number"
+                @updateExpression="$emit('updateExpression', $event)"
+            />
         </div>
     </div>
 </template>
@@ -38,15 +38,25 @@ export default {
     data () {
         return {
             column: 'repeat(' + this.columns +', 1fr)',
-            row: 'repeat(' + this.row + ', 1fr)'
+            row: 'repeat(' + this.row + ', 1fr)',
         }
     },
-    methods: {
-        calculateRequiredButtons: function() {
-            var gridSize = this.rows*this.columns
-            console.log(gridSize)
+    computed: {
+        requiredButtons() {
+            var buttons = this.numbers
+            var gridSize = (this.rows)*(this.columns)
+            var sizeNumbers = this.numbers.length
+
+            if (sizeNumbers < gridSize) {
+                var diff = gridSize-sizeNumbers
+                for (let i = 0; i < diff; i++) {
+                    buttons.push('')
+                }
+            }
+            return buttons
         }
-    }
+    },
+    emits: [ 'updateExpression' ]
 }
 
 </script>
@@ -56,11 +66,13 @@ export default {
   display: grid;
   grid-template-columns: v-bind(column);
   grid-template-rows: v-bind(row);
-  gap: 8px;
+  width: v-bind((columns*64) + 'px');
+  margin-left: 8px;
 }
 
 .button {
   text-align: center;
+  max-width: 64;
+  max-height: 50;
 }
-
 </style>

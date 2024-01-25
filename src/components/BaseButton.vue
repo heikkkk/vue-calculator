@@ -42,7 +42,7 @@ input {
     white-space: nowrap;
     background-color: aliceblue;
     height: 50px;
-    width: 62px;
+    width: 64px;
 }
 
 :hover {
