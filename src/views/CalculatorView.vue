@@ -1,4 +1,5 @@
 <template>
+    <div id="calculator">
     <div class="calculator-container">
         <label class="error-label">{{ displayError }}</label>
         <CalculatorDisplay
@@ -20,9 +21,11 @@
             ></ButtonGroup>
         </div>
     </div>
-    <div>
+    <div id="log">
         <CalculatorLog></CalculatorLog>
     </div>
+</div>
+    
 </template>
 
 <script lang="ts">
@@ -143,10 +146,19 @@ export default {
 
 <style scoped>
 .calculator-container {
-  display: flex;
+  flex: 100;
   flex-direction: column;
   align-items: flex-end;
   width: 100%;
+}
+
+#calculator {
+    display: flex;
+}
+
+#log {
+    min-width: 200px;
+    float: right;
 }
 
 .button-groups {

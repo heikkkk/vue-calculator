@@ -17,3 +17,9 @@ const log = logStore.log
 
 </script>
 
+<style scoped>
+li {
+    color: aliceblue;
+}
+</style>
+
