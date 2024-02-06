@@ -1,52 +1,113 @@
-<script setup>
-  import FeedBackInput from '@/components/FeedbackInput.vue'
-  import { reactive } from 'vue'
-
-  const feedback = reactive(
-    {
-      name: '',
-      email: '',
-      message: '',
-      
-    })
-
-    function  onSubmit() {
-      alert('Submitted')
-    }
-    
-</script>
-
 <template>
     <div class="container">
       <h1>Gi oss tilbakemelding</h1>
-      <form @submit.prevent="onSubmit">
+      <form @submit="submit">
         <FeedBackInput
-          v-model="feedback.name"
           label="Navn"
           type="text"
+          :error="errors.name"
+          :modelValue="name"
+          @change="handleChange"
         ></FeedBackInput>
 
         <FeedBackInput
           label="Epost"
           type="email"
-          v-model="feedback.email"
-          error="Her er det eil"
-
+          :error="errors.email"
+          :modelValue="email"
+          @change="handleChange"
         ></FeedBackInput>
 
         <FeedBackInput
           label="Melding"
-          v-model="feedback.message"
           class="message"
           type="text"
-          error="Her er det eil"
+          :error="errors.message"
+          :modelValue="message"
+          @change="handleChange"
         ></FeedBackInput>
         <button type="submit">Send inn</button>
       </form>
-
-      <pre>{{ feedback }}</pre>
+      <!--<pre>{{ feedback }}</pre>-->
     </div>
 </template>
+
+<script>
+import FeedBackInput from '@/components/FeedbackInput.vue'
+import { useField, useForm } from 'vee-validate'
+import { useUserStore } from '@/stores/user'
+
+export default {
+  setup () {
+    const required = value => {
+      const requiredMessage = 'Dette feltet er påkrevd'
+      if (value === undefined || value === null) return requiredMessage
+        if (!String(value).length) return requiredMessage
+
+        return true
+    }
+
+    const emailSyntax = value => {
+      const emailRegex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+          if (!emailRegex.test(String(value).toLowerCase())) {
+            return 'Vennligst skriv inn en gyldig epost-adresse'
+          }
+
+          return true
+    }
+
+    const validationSchema = {
+      name: required,
+      email: value => {
+        const req = required(value)
+        if (req !== true) return req
+
+        const emailCheck = emailSyntax(value)
+        if (emailCheck !== true) return emailCheck
+
+        return true
+      },
+      message: required
+    }
+
+    const { handleSubmit, errors, setFieldValue } = useForm({
+      validationSchema,
+      initialValues: {
+        name: useUserStore().name,
+        email: useUserStore().email
+      }
+    })
+
+    const { value: name } = useField('name')
+    const { value: email } = useField('email')
+    const { value: message } = useField('message')
+
+    const handleChange = (event) => {
+      let field = ''
+      if (event.target.id == 1) field = 'name'
+      else if (event.target.id == 2) field = 'email'
+      else if (event.target.id == 3) field = 'message'
+
+      setFieldValue(field, event.target.value)
+    }
+
+    const submit = handleSubmit(values => {
+      console.log('submit', values)
+    })
+
+    return {
+      name,
+      email,
+      message,
+      errors,
+      handleChange,
+      submit,
+    }
+  },
+  components: {FeedBackInput}
+}
+    
+</script>
 
 <style scoped>
 .container {
