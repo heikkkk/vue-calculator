@@ -36,6 +36,7 @@
 import FeedBackInput from '@/components/FeedbackInput.vue'
 import { useField, useForm } from 'vee-validate'
 import { useUserStore } from '@/stores/user'
+import axios from 'axios'
 
 export default {
   setup () {
