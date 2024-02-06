@@ -37,6 +37,7 @@ import FeedBackInput from '@/components/FeedbackInput.vue'
 import { useField, useForm } from 'vee-validate'
 import { useUserStore } from '@/stores/user'
 import axios from 'axios'
+import { reactive } from 'vue'
 
 export default {
   setup () {
@@ -91,10 +92,22 @@ export default {
 
       setFieldValue(field, event.target.value)
     }
+    
 
     const submit = handleSubmit(values => {
       console.log('submit', values)
+      axios.post('https://my-json-server.typicode.com/heikkkk/vue-calculator/feedback', values)
+      .then(function (response) {
+        console.log('Response', response)
+      })
+      .catch(function (err) {
+        console.log('Error', err)
+      })
+      
     })
+
+
+    
 
     return {
       name,
