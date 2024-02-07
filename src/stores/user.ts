@@ -5,12 +5,12 @@ export const useUserStore = defineStore('user', () => {
     const name = ref('')
     const email = ref('')
 
-    function updateName(newName: string) {
+    function setName(newName: string) {
         name.value = newName
     }
-    function updateEmail(newEmail: string) {
+    function setEmail(newEmail: string) {
         email.value = newEmail
     }
 
-    return {name, email, updateEmail, updateName} 
+    return {name, email, setEmail, setName} 
 })

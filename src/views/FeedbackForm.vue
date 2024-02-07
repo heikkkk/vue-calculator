@@ -1,34 +1,34 @@
 <template>
+    <h1 data-cy='success-message'>{{ successMessage }}</h1>
     <div class="container">
-      <h1>Gi oss tilbakemelding</h1>
-      <form @submit="submit">
-        <FeedBackInput
-          label="Navn"
-          type="text"
-          :error="errors.name"
-          :modelValue="name"
-          @change="handleChange"
-        ></FeedBackInput>
+      <h1 data-cy="page-title">Gi oss tilbakemelding</h1>
+        <form @submit="submit">
+          <FeedBackInput
+            label="Navn"
+            type="text"
+            :error="errors.name"
+            v-model="name"
+            data-cy='name-input'
+          ></FeedBackInput>
 
-        <FeedBackInput
-          label="Epost"
-          type="email"
-          :error="errors.email"
-          :modelValue="email"
-          @change="handleChange"
-        ></FeedBackInput>
+          <FeedBackInput
+            label="Epost"
+            type="email"
+            :error="errors.email"
+            v-model="email"
+            data-cy='email-input'
+          ></FeedBackInput>
 
-        <FeedBackInput
-          label="Melding"
-          class="message"
-          type="text"
-          :error="errors.message"
-          :modelValue="message"
-          @change="handleChange"
-        ></FeedBackInput>
-        <button type="submit">Send inn</button>
-      </form>
-      <!--<pre>{{ feedback }}</pre>-->
+          <FeedBackInput
+            label="Melding"
+            class="message"
+            type="text"
+            :error="errors.message"
+            v-model="message"
+            data-cy='message-input'
+          ></FeedBackInput>
+          <button :disabled="!meta.valid" type="submit" data-cy='form-button'>Send inn</button>
+        </form>
     </div>
 </template>
 
@@ -37,7 +37,8 @@ import FeedBackInput from '@/components/FeedbackInput.vue'
 import { useField, useForm } from 'vee-validate'
 import { useUserStore } from '@/stores/user'
 import axios from 'axios'
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
+
 
 export default {
   setup () {
@@ -48,7 +49,7 @@ export default {
 
         return true
     }
-
+    const successMessage = ref('')
     const emailSyntax = value => {
       const emailRegex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
           if (!emailRegex.test(String(value).toLowerCase())) {
@@ -72,7 +73,7 @@ export default {
       message: required
     }
 
-    const { handleSubmit, errors, setFieldValue } = useForm({
+    const { handleSubmit, errors, setFieldValue, meta } = useForm({
       validationSchema,
       initialValues: {
         name: useUserStore().name,
@@ -94,20 +95,20 @@ export default {
     }
     
 
-    const submit = handleSubmit(values => {
-      console.log('submit', values)
+    const submit = handleSubmit(values => {      
+      useUserStore().setName(values.name)
+      useUserStore().setEmail(values.email)
+
       axios.post('https://my-json-server.typicode.com/heikkkk/vue-calculator/feedback', values)
       .then(function (response) {
         console.log('Response', response)
+        successMessage.value = 'Success'
       })
       .catch(function (err) {
         console.log('Error', err)
       })
       
     })
-
-
-    
 
     return {
       name,
@@ -116,6 +117,8 @@ export default {
       errors,
       handleChange,
       submit,
+      successMessage,
+      meta
     }
   },
   components: {FeedBackInput}
@@ -124,6 +127,10 @@ export default {
 </script>
 
 <style scoped>
+
+h1 {
+  color: aliceblue;
+}
 .container {
   display: flex;
   flex-direction: column;
@@ -164,6 +171,10 @@ button:hover {
     transform: translate(-4px,-4px);
 }
 
+button:disabled{
+  transform: translate(0px,0px);
+  cursor:default;
+}
 
 
 button:focus-visible {
